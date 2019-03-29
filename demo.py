@@ -1,10 +1,11 @@
-import os
 import codecs
-import numpy
-import keras
-from keras_wc_embd import get_dicts_generator, get_batch_input, get_embedding_weights_from_file
-from model import build_model
+import os
 
+import keras
+import numpy
+from keras_wc_embd import get_batch_input, get_dicts_generator, get_embedding_weights_from_file
+
+from model import build_model
 
 MODEL_PATH = 'model.h5'
 
@@ -94,6 +95,14 @@ train_steps = (len(train_sentences) + BATCH_SIZE - 1) // BATCH_SIZE
 valid_steps = (len(valid_sentences) + BATCH_SIZE - 1) // BATCH_SIZE
 
 
+def to_categorical_tensor(x3d, n_cls):
+    batch_size, n_rows = x3d.shape
+    x1d = x3d.ravel()
+    y1d = keras.utils.to_categorical(x1d, num_classes=n_cls)
+    y4d = y1d.reshape([batch_size, n_rows, n_cls])
+    return y4d
+
+
 def batch_generator(sentences, taggings, steps, training=True):
     global word_dict, char_dict, max_word_len
     while True:
@@ -114,7 +123,7 @@ def batch_generator(sentences, taggings, steps, training=True):
             sentence_len = word_input.shape[1]
             for j in range(len(batch_taggings)):
                 batch_taggings[j] = batch_taggings[j] + [0] * (sentence_len - len(batch_taggings[j]))
-            batch_taggings = keras.utils.to_categorical(numpy.asarray(batch_taggings), len(TAGS))
+            batch_taggings = to_categorical_tensor(numpy.asarray(batch_taggings), len(TAGS))
             yield [word_input, char_input], batch_taggings
         if not training:
             break

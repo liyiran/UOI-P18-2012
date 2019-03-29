@@ -15,8 +15,8 @@ def _loss(layers, rnn_units, lmbd):
     def __loss(y_true, y_pred):
         kernel_cs_forward, kernel_cs_backward = [], []
         for (forward, backward) in layers:
-            kernel_c_forward = forward.cell.trainable_weights[1][:, rnn_units * 2:rnn_units * 3]
-            kernel_c_backward = backward.cell.trainable_weights[1][:, rnn_units * 2:rnn_units * 3]
+            kernel_c_forward = forward.trainable_weights[1][:, rnn_units * 2:rnn_units * 3]
+            kernel_c_backward = backward.trainable_weights[1][:, rnn_units * 2:rnn_units * 3]
             kernel_cs_forward.append(K.reshape(kernel_c_forward, (rnn_units * rnn_units,)))
             kernel_cs_backward.append(K.reshape(kernel_c_backward, (rnn_units * rnn_units,)))
         phi_forward = K.stack(kernel_cs_forward)
